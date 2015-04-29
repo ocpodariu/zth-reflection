@@ -67,10 +67,10 @@ public class QueryBuilder {
 
         // Add columns
         for (int i = 0; i < queryColumns.size() - 1; i++) {
-            sql.append(queryColumns.get(i).getColumnName());
+            sql.append(queryColumns.get(i).getDbName());
             sql.append(",");
         }
-        sql.append(queryColumns.get(queryColumns.size() - 1).getColumnName());
+        sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
 
         // Add table name
         sql.append("\nFROM ");
@@ -107,12 +107,12 @@ public class QueryBuilder {
         // Add columns to be updated
         sql.append("SET ");
         for (int i = 0; i < queryColumns.size() - 1; i++) {
-            sql.append(queryColumns.get(i).getColumnName());
+            sql.append(queryColumns.get(i).getDbName());
             sql.append(" = ");
             sql.append(queryColumns.get(i).getValue());
             sql.append(", ");
         }
-        sql.append(queryColumns.get(queryColumns.size() - 1).getColumnName());
+        sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
         sql.append(" = ");
         sql.append(queryColumns.get(queryColumns.size() - 1).getValue());
 
@@ -147,10 +147,10 @@ public class QueryBuilder {
         // Add columns
         sql.append(" (");
         for (int i = 0; i < queryColumns.size() - 1; i++) {
-            sql.append(queryColumns.get(i).getColumnName());
+            sql.append(queryColumns.get(i).getDbName());
             sql.append(", ");
         }
-        sql.append(queryColumns.get(queryColumns.size() - 1).getColumnName());
+        sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
         sql.append(")");
 
         // Add values corresponding to each column
