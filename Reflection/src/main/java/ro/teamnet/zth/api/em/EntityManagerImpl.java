@@ -33,7 +33,7 @@ public class EntityManagerImpl implements EntityManager {
             String id_column = null;
             for (ColumnInfo column : columns) {
                 if (column.isId()) {
-                    id_column = column.getColumnName();
+                    id_column = column.getDbName();
                     break;
                 }
             }
@@ -51,10 +51,10 @@ public class EntityManagerImpl implements EntityManager {
 
             // Create the actual query
             QueryBuilder queryBuilder = new QueryBuilder();
-            queryBuilder.setTableName(tableName);
-            queryBuilder.setQueryType(QueryType.SELECT);
-            queryBuilder.addQueryColumns(columns);
-            queryBuilder.addCondition(condition);
+            queryBuilder.setTableName(tableName)
+                        .setQueryType(QueryType.SELECT)
+                        .addQueryColumns(columns)
+                        .addCondition(condition);
 
             String sqlQuery = queryBuilder.createQuery();
 
