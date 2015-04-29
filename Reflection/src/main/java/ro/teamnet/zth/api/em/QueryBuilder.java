@@ -1,5 +1,6 @@
 package ro.teamnet.zth.api.em;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +13,11 @@ public class QueryBuilder {
     private List<ColumnInfo> queryColumns;
     private QueryType queryType;
     private List<Condition> conditions;
+
+    public QueryBuilder() {
+        queryColumns = new ArrayList<ColumnInfo>();
+        conditions   = new ArrayList<Condition>();
+    }
 
     /**
      * Adds the new condition to the query
