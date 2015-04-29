@@ -8,6 +8,14 @@ import java.util.List;
  */
 public interface EntityManager {
 
+    /**
+     * Searches the database table corresponding to the given entity
+     * for the record having the specified ID.
+     * @param entityClass
+     * @param id primary key value
+     * @param <T>
+     * @return instance of the entity corresponding to the found database record
+     */
     <T> T findById(Class<T> entityClass, Long id);
 
     <T> List<T> findAll(Class<T> entityClass);
