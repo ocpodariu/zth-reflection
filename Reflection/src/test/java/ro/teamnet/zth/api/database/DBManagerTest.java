@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Author: Ovidiu
@@ -18,6 +19,13 @@ public class DBManagerTest {
         Connection connection = DBManager.getConnection();
 
         Assert.assertNotNull("Failed to open database connection!", connection);
+
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            System.out.println("Failed to close database connection!");
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -27,6 +35,13 @@ public class DBManagerTest {
         Connection connection = DBManager.getConnection();
 
         Assert.assertTrue(DBManager.checkConnection(connection));
+
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            System.out.println("Failed to close database connection!");
+            e.printStackTrace();
+        }
     }
 
 }
