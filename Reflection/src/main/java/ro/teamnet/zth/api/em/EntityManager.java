@@ -34,7 +34,7 @@ public interface EntityManager {
      * @param <T>
      * @return entity corresponding to the newly inserted record, including the ID
      */
-    <T> Object insert(T entity);
+    <T> T insert(T entity);
 
     /**
      * Updates an existing database record corresponding to the given entity.

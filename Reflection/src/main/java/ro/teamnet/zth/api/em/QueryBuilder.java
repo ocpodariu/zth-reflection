@@ -70,26 +70,30 @@ public class QueryBuilder {
             sql.append(queryColumns.get(i).getDbName());
             sql.append(",");
         }
-        sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
+        if (queryColumns.size() > 0)
+            sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
 
         // Add table name
         sql.append("\nFROM ");
         sql.append(tableName.toString());
 
         // Add conditions
-        sql.append("WHERE ");
-        for (int i = 0; i < conditions.size() - 1; i++) {
-            sql.append(conditions.get(i).getColumnName());
+        if (conditions.size() > 0) {
+            sql.append("\nWHERE ");
+            for (int i = 0; i < conditions.size() - 1; i++) {
+                sql.append(conditions.get(i).getColumnName());
+                sql.append(" = ");
+                if (conditions.get(i).getValue() instanceof String)
+                    sql.append("'").append(conditions.get(i).getValue().toString()).append("'");
+                else
+                    sql.append(conditions.get(i).getValue().toString());
+                sql.append(" AND ");
+            }
+
+            sql.append(conditions.get(conditions.size() - 1).getColumnName());
             sql.append(" = ");
-            if (conditions.get(i).getValue() instanceof String)
-                sql.append("'").append(conditions.get(i).getValue().toString()).append("'");
-            else
-                sql.append(conditions.get(i).getValue().toString());
-            sql.append(" AND ");
+            sql.append(conditions.get(conditions.size() - 1).getValue().toString());
         }
-        sql.append(conditions.get(conditions.size() - 1).getColumnName());
-        sql.append(" = ");
-        sql.append(conditions.get(conditions.size() - 1).getValue().toString());
         sql.append(";");
 
         return sql.toString();
@@ -102,34 +106,45 @@ public class QueryBuilder {
         StringBuilder sql = new StringBuilder("UPDATE ");
 
         // Add table name
-        sql.append(tableName.toString()).append("\n");
+        sql.append(tableName.toString());
 
         // Add columns to be updated
-        sql.append("SET ");
+        sql.append("\nSET ");
         for (int i = 0; i < queryColumns.size() - 1; i++) {
             sql.append(queryColumns.get(i).getDbName());
             sql.append(" = ");
-            sql.append(queryColumns.get(i).getValue());
+            if (queryColumns.get(i).getValue() instanceof String)
+                sql.append("'").append(queryColumns.get(i).getValue()).append("'");
+            else
+                sql.append(queryColumns.get(i).getValue());
             sql.append(", ");
         }
-        sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
-        sql.append(" = ");
-        sql.append(queryColumns.get(queryColumns.size() - 1).getValue());
+        if (queryColumns.size() > 0) {
+            sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
+            sql.append(" = ");
+            if (queryColumns.get(queryColumns.size() - 1).getValue() instanceof String)
+                sql.append("'").append(queryColumns.get(queryColumns.size() - 1).getValue()).append("'");
+            else
+                sql.append(queryColumns.get(queryColumns.size() - 1).getValue());
+        }
 
         // Add conditions
-        sql.append("WHERE ");
-        for (int i = 0; i < conditions.size() - 1; i++) {
-            sql.append(conditions.get(i).getColumnName());
+        if (conditions.size() > 0) {
+            sql.append("\nWHERE ");
+            for (int i = 0; i < conditions.size() - 1; i++) {
+                sql.append(conditions.get(i).getColumnName());
+                sql.append(" = ");
+                if (conditions.get(i).getValue() instanceof String)
+                    sql.append("'").append(conditions.get(i).getValue().toString()).append("'");
+                else
+                    sql.append(conditions.get(i).getValue().toString());
+                sql.append(" AND ");
+            }
+
+            sql.append(conditions.get(conditions.size() - 1).getColumnName());
             sql.append(" = ");
-            if (conditions.get(i).getValue() instanceof String)
-                sql.append("'").append(conditions.get(i).getValue().toString()).append("'");
-            else
-                sql.append(conditions.get(i).getValue().toString());
-            sql.append(" AND ");
+            sql.append(conditions.get(conditions.size() - 1).getValue().toString());
         }
-        sql.append(conditions.get(conditions.size() - 1).getColumnName());
-        sql.append(" = ");
-        sql.append(conditions.get(conditions.size() - 1).getValue().toString());
         sql.append(";");
 
         return sql.toString();
@@ -145,21 +160,30 @@ public class QueryBuilder {
         sql.append(tableName.toString()).append("\n");
 
         // Add columns
-        sql.append(" (");
-        for (int i = 0; i < queryColumns.size() - 1; i++) {
-            sql.append(queryColumns.get(i).getDbName());
-            sql.append(", ");
+        if (queryColumns.size() > 0) {
+            sql.append(" (");
+            for (int i = 0; i < queryColumns.size() - 1; i++) {
+                sql.append(queryColumns.get(i).getDbName());
+                sql.append(", ");
+            }
+            sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
+            sql.append(")");
         }
-        sql.append(queryColumns.get(queryColumns.size() - 1).getDbName());
-        sql.append(")");
 
         // Add values corresponding to each column
         sql.append("\nVALUES (");
         for (int i = 0; i < queryColumns.size() - 1; i++) {
-            sql.append(queryColumns.get(i).getValue());
+            if (queryColumns.get(i).getValue() instanceof String)
+                sql.append("'").append(queryColumns.get(i).getValue()).append("'");
+            else
+                sql.append(queryColumns.get(i).getValue());
             sql.append(", ");
         }
-        sql.append(queryColumns.get(queryColumns.size() - 1).getValue());
+        if (queryColumns.get(queryColumns.size() - 1).getValue() instanceof String)
+            sql.append("'").append(queryColumns.get(queryColumns.size() - 1).getValue()).append("'");
+        else
+            sql.append(queryColumns.get(queryColumns.size() - 1).getValue());
+
         sql.append(");");
 
         return sql.toString();
@@ -172,10 +196,10 @@ public class QueryBuilder {
         StringBuilder sql = new StringBuilder("DELETE FROM ");
 
         // Add table name
-        sql.append(tableName.toString()).append("\n");
+        sql.append(tableName.toString());
 
         // Add conditions
-        sql.append("WHERE ");
+        sql.append("\nWHERE ");
         for (int i = 0; i < conditions.size() - 1; i++) {
             sql.append(conditions.get(i).getColumnName());
             sql.append(" = ");

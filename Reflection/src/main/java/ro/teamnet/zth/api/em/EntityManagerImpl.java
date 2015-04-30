@@ -59,32 +59,40 @@ public class EntityManagerImpl implements EntityManager {
 
             String sqlQuery = queryBuilder.createQuery();
 
+            System.out.println("Query: " + sqlQuery);
+
             // Execute the query and store the results in a new instance of class
             try (Statement stmt = conn.createStatement();
                  ResultSet result = stmt.executeQuery(sqlQuery)) {
-                result.first();
+                if (result.first()) {
+                    // Create an instance and set its values
+                    T instance = entityClass.newInstance();
 
-                // Create an instance and set its values
-                T instance = entityClass.newInstance();
-
-                Field field;
-                for (ColumnInfo column : columns) {
-                    if (column.getColumnType() == String.class) {
-                        field = entityClass.getDeclaredField(column.getColumnName());
-                        field.set(instance, result.getString(column.getDbName()));
-                    } else if (column.getColumnType() == Long.class) {
-                        field = entityClass.getDeclaredField(column.getColumnName());
-                        field.set(instance, result.getLong(column.getDbName()));
-                    } else if (column.getColumnType() == Double.class) {
-                        field = entityClass.getDeclaredField(column.getColumnName());
-                        field.set(instance, result.getDouble(column.getDbName()));
-                    } else if (column.getColumnType() == Date.class) {
-                        field = entityClass.getDeclaredField(column.getColumnName());
-                        field.set(instance, result.getDate(column.getDbName()));
+                    Field field;
+                    for (ColumnInfo column : columns) {
+                        if (column.getColumnType() == String.class) {
+                            field = entityClass.getDeclaredField(column.getColumnName());
+                            field.setAccessible(true);
+                            field.set(instance, result.getString(column.getDbName()));
+                        } else if (column.getColumnType() == Long.class) {
+                            field = entityClass.getDeclaredField(column.getColumnName());
+                            field.setAccessible(true);
+                            field.set(instance, result.getLong(column.getDbName()));
+                        } else if (column.getColumnType() == Double.class) {
+                            field = entityClass.getDeclaredField(column.getColumnName());
+                            field.setAccessible(true);
+                            field.set(instance, result.getDouble(column.getDbName()));
+                        } else if (column.getColumnType() == Date.class) {
+                            field = entityClass.getDeclaredField(column.getColumnName());
+                            field.setAccessible(true);
+                            field.set(instance, result.getDate(column.getDbName()));
+                        }
                     }
-                }
 
-                return instance;
+                    return instance;
+                } else {
+                    return null;
+                }
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
                 return null;
@@ -126,6 +134,8 @@ public class EntityManagerImpl implements EntityManager {
 
             String sqlQuery = queryBuilder.createQuery();
 
+            System.out.println("Query: " + sqlQuery);
+
             // Execute the query and store results in a list
             try (Statement stmt = conn.createStatement();
                  ResultSet results = stmt.executeQuery(sqlQuery)) {
@@ -139,15 +149,19 @@ public class EntityManagerImpl implements EntityManager {
                     for (ColumnInfo column : columns) {
                         if (column.getColumnType() == String.class) {
                             field = entityClass.getDeclaredField(column.getColumnName());
+                            field.setAccessible(true);
                             field.set(instance, results.getString(column.getDbName()));
                         } else if (column.getColumnType() == Long.class) {
                             field = entityClass.getDeclaredField(column.getColumnName());
+                            field.setAccessible(true);
                             field.set(instance, results.getLong(column.getDbName()));
                         } else if (column.getColumnType() == Double.class) {
                             field = entityClass.getDeclaredField(column.getColumnName());
+                            field.setAccessible(true);
                             field.set(instance, results.getDouble(column.getDbName()));
                         } else if (column.getColumnType() == Date.class) {
                             field = entityClass.getDeclaredField(column.getColumnName());
+                            field.setAccessible(true);
                             field.set(instance, results.getDate(column.getDbName()));
                         }
                     }
@@ -179,7 +193,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> Object insert(T entity) {
+    public <T> T insert(T entity) {
         // Create a connection to the Database
         try (Connection conn = DBManager.getConnection()) {
             // Get table name
@@ -193,6 +207,7 @@ public class EntityManagerImpl implements EntityManager {
                 Field field;
                 for (ColumnInfo column : columns) {
                     field = entity.getClass().getDeclaredField(column.getColumnName());
+                    field.setAccessible(true);
                     column.setValue(field.get(entity));
                 }
             } catch (NoSuchFieldException e) {
@@ -211,13 +226,15 @@ public class EntityManagerImpl implements EntityManager {
 
             String sqlQuery = queryBuilder.createQuery();
 
+            System.out.println("Query: " + sqlQuery);
+
             // Execute the query and store the results in a new instance of class
             try (Statement stmt = conn.createStatement()) {
                 // Execute insert operation
-                stmt.executeQuery(sqlQuery);
+                stmt.executeUpdate(sqlQuery);
 
                 // Commit changes to database
-                conn.commit();
+                // conn.commit();
 
                 // Get last inserted id from database
                 ResultSet resultId = stmt.executeQuery("SELECT last_insert_id();");
@@ -225,7 +242,7 @@ public class EntityManagerImpl implements EntityManager {
                 if (resultId.next()) {
                     Long id = resultId.getLong(1);
 
-                    return findById(entity.getClass(), id);
+                    return (T) findById(entity.getClass(), id);
                 } else {
                     return null;
                 }
@@ -256,6 +273,7 @@ public class EntityManagerImpl implements EntityManager {
                 Field field;
                 for (ColumnInfo column : columns) {
                     field = entity.getClass().getDeclaredField(column.getColumnName());
+                    field.setAccessible(true);
                     column.setValue(field.get(entity));
                 }
             } catch (NoSuchFieldException e) {
@@ -294,10 +312,10 @@ public class EntityManagerImpl implements EntityManager {
             // Execute the query and store the results in a new instance of class
             try (Statement stmt = conn.createStatement()) {
                 // Execute query
-                stmt.executeQuery(sqlQuery);
+                stmt.executeUpdate(sqlQuery);
 
                 // Commit changes to database
-                conn.commit();
+                // conn.commit();
 
                 return entity;
             } catch (SQLException e) {
@@ -327,6 +345,7 @@ public class EntityManagerImpl implements EntityManager {
                 Field field;
                 for (ColumnInfo column : columns) {
                     field = entity.getClass().getDeclaredField(column.getColumnName());
+                    field.setAccessible(true);
                     column.setValue(field.get(entity));
                 }
             } catch (NoSuchFieldException e) {
@@ -354,13 +373,13 @@ public class EntityManagerImpl implements EntityManager {
             // Create the actual query
             QueryBuilder queryBuilder = new QueryBuilder();
             queryBuilder.setTableName(tableName)
-                    .setQueryType(QueryType.UPDATE)
+                    .setQueryType(QueryType.DELETE)
                     .addQueryColumns(columns)
                     .addCondition(condition);
 
             String sqlQuery = queryBuilder.createQuery();
 
-            conn.createStatement().executeQuery(sqlQuery);
+            conn.createStatement().executeUpdate(sqlQuery);
 
             // Commit ???
             // conn.commit();
