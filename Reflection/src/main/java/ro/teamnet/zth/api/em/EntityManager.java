@@ -36,6 +36,13 @@ public interface EntityManager {
      */
     <T> Object insert(T entity);
 
+    /**
+     * Updates an existing record corresponding to the given entity.
+     * @param entity
+     * @param <T>
+     * @return <b>same entity</b> if the update operation has been successful;
+     *         <br><b>null</b> otherwise
+     */
     <T> T update(T entity);
 
     void delete(Object entity);

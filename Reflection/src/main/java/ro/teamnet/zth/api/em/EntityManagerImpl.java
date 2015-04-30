@@ -242,7 +242,75 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T update(T entity) { return null; }
+    public <T> T update(T entity) {
+        // Create a connection to the Database
+        try (Connection conn = DBManager.getConnection()) {
+            // Get table name
+            String tableName = EntityUtils.getTableName(entity.getClass());
+
+            // Get table columns
+            List<ColumnInfo> columns = EntityUtils.getColumns(entity.getClass());
+
+            // Set column values to the current values of the entity
+            try {
+                Field field;
+                for (ColumnInfo column : columns) {
+                    field = entity.getClass().getDeclaredField(column.getColumnName());
+                    column.setValue(field.get(entity));
+                }
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            // Get ID column name and value of record to be updated
+            String idColumn = null;
+            Object idValue = null;
+
+            for (ColumnInfo column : columns)
+                if (column.isId()) {
+                    idColumn = column.getDbName();
+                    idValue = column.getValue();
+                    break;
+                }
+
+            // Define query condition (find by ID and update)
+            Condition condition = new Condition();
+            condition.setColumnName(idColumn);
+            condition.setValue(idValue);
+
+            // Create the actual query
+            QueryBuilder queryBuilder = new QueryBuilder();
+            queryBuilder.setTableName(tableName)
+                        .setQueryType(QueryType.UPDATE)
+                        .addQueryColumns(columns)
+                        .addCondition(condition);
+
+            String sqlQuery = queryBuilder.createQuery();
+
+            // Execute the query and store the results in a new instance of class
+            try (Statement stmt = conn.createStatement()) {
+                // Execute query
+                stmt.executeQuery(sqlQuery);
+
+                // Commit changes to database
+                conn.commit();
+
+                return entity;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     @Override
     public void delete(Object entity) {
