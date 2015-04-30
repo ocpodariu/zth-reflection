@@ -18,6 +18,13 @@ public interface EntityManager {
      */
     <T> T findById(Class<T> entityClass, Long id);
 
+    /**
+     * Returns all records contained in the database table corresponding
+     * to the given entity.
+     * @param entityClass
+     * @param <T>
+     * @return list containing records
+     */
     <T> List<T> findAll(Class<T> entityClass);
 
     <T> Object insert(T entity);

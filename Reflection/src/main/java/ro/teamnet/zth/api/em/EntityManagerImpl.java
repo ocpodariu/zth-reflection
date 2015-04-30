@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -107,6 +108,73 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> List<T> findAll(Class<T> entityClass) {
+        List<T> records = new ArrayList<T>();
+
+        // Create a connection to the Database
+        try (Connection conn = DBManager.getConnection()) {
+            // Get table name
+            String tableName = EntityUtils.getTableName(entityClass);
+
+            // Get table columns
+            List<ColumnInfo> columns = EntityUtils.getColumns(entityClass);
+
+            // Create the actual query
+            QueryBuilder queryBuilder = new QueryBuilder();
+            queryBuilder.setTableName(tableName)
+                        .setQueryType(QueryType.SELECT)
+                        .addQueryColumns(columns);
+
+            String sqlQuery = queryBuilder.createQuery();
+
+            // Execute the query and store results in a list
+            try (Statement stmt = DBManager.getConnection().createStatement();
+                 ResultSet results = stmt.executeQuery(sqlQuery)) {
+
+                // Navigate result set
+                while(results.next()) {
+                    // Create an instance and set its values
+                    T instance = entityClass.newInstance();
+
+                    Field field;
+                    for (ColumnInfo column : columns) {
+                        if (column.getColumnType() == String.class) {
+                            field = entityClass.getDeclaredField(column.getColumnName());
+                            field.set(instance, results.getString(column.getDbName()));
+                        } else if (column.getColumnType() == Long.class) {
+                            field = entityClass.getDeclaredField(column.getColumnName());
+                            field.set(instance, results.getLong(column.getDbName()));
+                        } else if (column.getColumnType() == Double.class) {
+                            field = entityClass.getDeclaredField(column.getColumnName());
+                            field.set(instance, results.getDouble(column.getDbName()));
+                        } else if (column.getColumnType() == Date.class) {
+                            field = entityClass.getDeclaredField(column.getColumnName());
+                            field.set(instance, results.getDate(column.getDbName()));
+                        }
+                    }
+
+                    // Store it in the records list
+                    records.add(instance);
+                }
+
+                return records;
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+                return null;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
