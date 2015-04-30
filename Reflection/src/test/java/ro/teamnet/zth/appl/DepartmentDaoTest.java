@@ -2,12 +2,8 @@ package ro.teamnet.zth.appl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ro.teamnet.zth.api.em.EntityManager;
-import ro.teamnet.zth.api.em.EntityManagerImpl;
 import ro.teamnet.zth.appl.dao.DepartmentDao;
 import ro.teamnet.zth.appl.domain.Department;
-
-import java.util.List;
 
 /**
  * Author: Ovidiu
