@@ -180,13 +180,69 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> Object insert(T entity) {
+        // Create a connection to the Database
+        try (Connection conn = DBManager.getConnection()) {
+            // Get table name
+            String tableName = EntityUtils.getTableName(entity.getClass());
+
+            // Get table columns
+            List<ColumnInfo> columns = EntityUtils.getColumns(entity.getClass());
+
+            // Set column values to the current values of the entity
+            try {
+                Field field;
+                for (ColumnInfo column : columns) {
+                    field = entity.getClass().getDeclaredField(column.getColumnName());
+                    column.setValue(field.get(entity));
+                }
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            // Create the actual query
+            QueryBuilder queryBuilder = new QueryBuilder();
+            queryBuilder.setTableName(tableName)
+                        .setQueryType(QueryType.INSERT)
+                        .addQueryColumns(columns);
+
+            String sqlQuery = queryBuilder.createQuery();
+
+            // Execute the query and store the results in a new instance of class
+            try (Statement stmt = conn.createStatement()) {
+                // Execute insert operation
+                stmt.executeQuery(sqlQuery);
+
+                // Commit changes to database
+                conn.commit();
+
+                // Get last inserted id from database
+                ResultSet resultId = stmt.executeQuery("SELECT last_insert_id();");
+
+                if (resultId.next()) {
+                    Long id = resultId.getLong(1);
+
+                    return findById(entity.getClass(), id);
+                } else {
+                    return null;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
     @Override
-    public <T> T update(T entity) {
-        return null;
-    }
+    public <T> T update(T entity) { return null; }
 
     @Override
     public void delete(Object entity) {

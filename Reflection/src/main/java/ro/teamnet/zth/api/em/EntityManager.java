@@ -27,6 +27,13 @@ public interface EntityManager {
      */
     <T> List<T> findAll(Class<T> entityClass);
 
+    /**
+     * Inserts a new record into the database.
+     * @param entity contains values to be inserted, except the ID as it
+     *               will be automatically generated (AUTO_INCREMENT)
+     * @param <T>
+     * @return entity corresponding to the newly inserted record, including the ID
+     */
     <T> Object insert(T entity);
 
     <T> T update(T entity);
