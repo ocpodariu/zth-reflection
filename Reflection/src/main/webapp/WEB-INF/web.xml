@@ -4,7 +4,8 @@
 
 <web-app>
     <display-name>Web Application</display-name>
-    
+
+
     <filter>
         <filter-name>logHeaders</filter-name>
         <filter-class>ro.teamnet.zth.web.HeadersLogFilter</filter-class>
@@ -14,16 +15,24 @@
         <filter-name>logHeaders</filter-name>
         <servlet-name>HelloWorld</servlet-name>
     </filter-mapping>
-    
+
+
     <servlet>
         <servlet-name>HelloWorld</servlet-name>
         <description>HelloWorld Servlet</description>
         <servlet-class>ro.teamnet.zth.web.HelloWorldServlet</servlet-class>
     </servlet>
+
     <servlet>
         <servlet-name>ZeroToHero</servlet-name>
         <description>ZeroToHero Servlet</description>
         <servlet-class>ro.teamnet.zth.web.ZeroToHeroServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>HttpSession</servlet-name>
+        <description>HttpSession Servlet</description>
+        <servlet-class>ro.teamnet.zth.web.HttpSessionServlet</servlet-class>
     </servlet>
 
 
@@ -35,6 +44,11 @@
     <servlet-mapping>
         <servlet-name>ZeroToHero</servlet-name>
         <url-pattern>/zerotohero</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>HttpSession</servlet-name>
+        <url-pattern>/login</url-pattern>
     </servlet-mapping>
 
 
