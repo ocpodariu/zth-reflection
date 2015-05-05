@@ -6,10 +6,10 @@
   To change this template use File | Settings | File Templates.
 --%>
 
-<%@ page import="ro.teamnet.zth.appl.domain.Location" %>
-<%@ page import="java.util.List" %>
 <%@ page import="ro.teamnet.zth.appl.dao.LocationDao" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="ro.teamnet.zth.appl.domain.Location" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
@@ -20,6 +20,27 @@
 </head>
 
 <body>
+
+<% LocationDao locationDao = new LocationDao(); %>
+<% Location location = null; %>
+
+<%
+    Long locationId = null;
+
+    Enumeration parameterNames = request.getParameterNames();
+    while (parameterNames.hasMoreElements()) {
+        String paramName = (String) parameterNames.nextElement();
+        System.out.println(paramName);
+        if (paramName.equalsIgnoreCase("id")) {
+            locationId = Long.parseLong(request.getParameter(paramName));
+            System.out.println("Found ID: " + locationId);
+            break;
+        }
+    }
+
+    if (locationId != null)
+        location = locationDao.findById(locationId);
+%>
 
 <table border="1">
     <thead>
@@ -37,7 +58,27 @@
 
     %>
     <tr>
-        <!--TODO de completat cu cod pentru a afisa detaliile locatiei cu id-ul trimis din locationlist.jsp in momentul in care se acceseaza link-ul 'View'-->
+        <td>
+            <%= location.getId() %>
+        </td>
+
+        <td>
+            <%= location.getStreetAddress() %>
+        </td>
+
+        <td>
+            <%= location.getPostalCode() %>
+        </td>
+
+        <td>
+            <%= location.getCity() %>
+        </td>
+
+        <td>
+            <%= location.getStateProvince() %>
+        </td>
+
+
     </tr>
 
     </tbody>
